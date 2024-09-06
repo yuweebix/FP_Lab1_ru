@@ -1,15 +1,6 @@
-let rec FOR init cond iter func args =
-    match cond init with
-    | true -> FOR (iter init) cond iter func (func init args)
-    | false -> args
+#load "utility.fsx"
 
-let pown x n =
-    FOR
-        0
-        (fun i -> i < n)
-        (fun i -> i + 1)
-        (fun _ -> fun res -> res * x)
-        1.0
+open Utility
 
 let f x = x / (9.0 + pown x 2)
 let term x n = (pown -1.0 n) * (pown x (2*n+1)) / (pown 9.0 (n+1))
@@ -38,17 +29,10 @@ let smart x eps =
         (fun (i, xi) -> fun _ -> (xi, i+1))
         (0.0, 0)
 
-let printTable a b n eps =
+let main a b n eps =
     let step = (b - a) / float (n - 1)
     printfn "| x     | Builtin     | Smart Taylor | # terms | Dumb Taylor | # terms |"
     printfn "|-------|-------------|--------------|---------|-------------|---------|"
-    // for i in 0 .. n-1 do
-    //     let x = a + step * float i
-    //     let builtin = f x
-    //     let (smartResult, smartTerms) = smart x eps
-    //     let (dumbResult, dumbTerms) = naive x eps
-    //     printfn "| %5.1f | %11.5f | %12.5f | %7d | %11.5f | %7d |" x builtin smartResult smartTerms dumbResult dumbTerms
-
     FOR
         (1, a, (f a), (smart a eps), (naive a eps))
         (fun (i, _, _, _, _) -> i <= n)
@@ -58,4 +42,4 @@ let printTable a b n eps =
         ()
 
 
-printTable -1.0 1.0 21 1e-5
+main -1.0 1.0 21 1e-5
